@@ -590,8 +590,12 @@ public class DockPane extends StackPane
 
             if (split == root && sibling == root)
             {
-              this.getChildren().set(this.getChildren().indexOf(root),
-                                     splitPane);
+              int index = this.getChildren().indexOf(root);
+              if (index >= 0) {
+                this.getChildren().set(index, splitPane);
+              } else {
+                this.getChildren().add(splitPane);
+              }
               splitPane.getItems().add(split);
               root = splitPane;
             }
@@ -702,8 +706,7 @@ public class DockPane extends StackPane
    */
   void undock(DockNode node)
   {
-    if (!node.closedProperty().get())
-      undockedNodes.add(node);
+    undockedNodes.add(node);
 
     DockNodeEventHandler dockNodeEventHandler =
                                               dockNodeEventFilters.get(node);
@@ -723,16 +726,7 @@ public class DockPane extends StackPane
         ContentPane pane = (ContentPane) parent;
         pane.removeNode(findStack, node);
 
-        // if there is 0 children left, make sure we remove the split pane
-        if (pane.getChildrenList().isEmpty())
-        {
-          if (root == pane)
-          {
-            this.getChildren().remove((Node) pane);
-            root = null;
-          }
-        }
-        else if (pane.getChildrenList().size() == 1
+        if (pane.getChildrenList().size() == 1
                  && pane instanceof ContentTabPane
                  && pane.getChildrenList().get(0) instanceof DockNode)
         {
@@ -976,10 +970,10 @@ public class DockPane extends StackPane
                                                              .getLayoutBounds()
                                                              .getMinY());
 
-      floatingNode.addProperty("Position", new Double[]
-      { loc.getX(), loc.getY() });
-
-      contents.get("_FloatingNodes").addChild(floatingNode);
+      if (loc != null) {
+        floatingNode.addProperty("Position", new Double[] {loc.getX(), loc.getY()});
+        contents.get("_FloatingNodes").addChild(floatingNode);
+      }
     }
 
     // Prepare Docking Nodes collection
@@ -1120,16 +1114,15 @@ public class DockPane extends StackPane
   private void collectDockNodes(HashMap<String, DockNode> dockNodes,
                                 ContentPane pane)
   {
-    for (Node node : pane.getChildrenList())
-    {
-      if (node instanceof DockNode)
-      {
-        dockNodes.put(((DockNode) node).getTitle(), (DockNode) node);
-      }
+    if (pane != null) {
+      for (Node node : pane.getChildrenList()) {
+        if (node instanceof DockNode) {
+          dockNodes.put(((DockNode) node).getTitle(), (DockNode) node);
+        }
 
-      if (node instanceof ContentPane)
-      {
-        collectDockNodes(dockNodes, (ContentPane) node);
+        if (node instanceof ContentPane) {
+          collectDockNodes(dockNodes, (ContentPane) node);
+        }
       }
     }
   }
@@ -1229,19 +1222,20 @@ public class DockPane extends StackPane
       for (String title : dockNodes.keySet())
       {
         DockNode node = dockNodes.get(title);
-        node.setFloating(true, null, this);
-
-        node.getStage().setX(node.getStage().getX() + 100);
-        node.getStage().setY(node.getStage().getY() + 100);
+        node.close();
       }
 
       dockNodes.clear();
     }
 
     this.root = newRoot;
-    this.getChildren().set(0, this.root);
+    if (this.getChildren().isEmpty()) {
+      this.getChildren().add(this.root);
+    } else {
+      this.getChildren().set(0, this.root);
+    }
   }
-
+  
   private Node buildPane(ContentPane parent,
                          ContentHolder holder,
                          HashMap<String, DockNode> dockNodes,
@@ -1268,7 +1262,10 @@ public class DockPane extends StackPane
             {
               n.tabbedProperty().set(false);
             }
-
+            if (!dockNodes.get(item).isDocked()) 
+            {
+              dockNodes.get(item).dock(this, dockNodes.get(item).getLastDockPos());
+            }
             splitPane.getItems().add(dockNodes.get(item));
             dockNodes.remove(item);
           }
