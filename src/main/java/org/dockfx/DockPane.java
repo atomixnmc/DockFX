@@ -37,7 +37,9 @@ import java.util.logging.Logger;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
+import javafx.beans.Observable;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 import javafx.css.PseudoClass;
@@ -343,6 +345,26 @@ public class DockPane extends StackPane
     dockAreaIndicator.getStyleClass().add("dock-area-indicator");
 
     undockedNodes = FXCollections.observableArrayList();
+    
+    final DockPane finalThis = this;
+    
+    getChildren().addListener(new ListChangeListener<Node>() {
+      @Override
+      public void onChanged(Change<? extends Node> c) {
+        while (c.next()) {
+          if (c.wasAdded()) {
+            for (Node node : c.getAddedSubList()) {
+              if (node instanceof DockNode) {
+                getChildren().remove(node);// to prevent redundant child items; the dock function
+                                           // will add the child node back
+                DockNode dockNode = (DockNode) node;
+                dockNode.dock(finalThis, dockNode.getDockPos());
+              }
+            }
+          }
+        }
+      }
+    });
   }
 
   /**
@@ -657,6 +679,17 @@ public class DockPane extends StackPane
    *          The docking position of the node relative to the sibling.
    */
   void dock(Node node, DockPos dockPos)
+  {
+    dock(node, dockPos, root);
+  }
+  
+  public static DockPos dockPos;
+  
+  void add(Node node) {
+    dock(node, DockPos.LEFT, root);
+  }
+  
+  void add(Node node, DockPos dockPos)
   {
     dock(node, dockPos, root);
   }

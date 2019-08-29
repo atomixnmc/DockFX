@@ -292,6 +292,10 @@ public class DockNode extends VBox implements EventHandler<MouseEvent>
    * @param FXMLPath
    *          path to fxml file.
    */
+  public DockNode() {
+    this((Node) null, null, null);
+  }
+  
   public DockNode(String FXMLPath)
   {
     this(FXMLPath, null, null);
@@ -347,14 +351,18 @@ public class DockNode extends VBox implements EventHandler<MouseEvent>
     this.viewController = controller;
 
     dockTitleBar = new DockTitleBar(this);
-    getChildren().addAll(dockTitleBar, contents);
+    getChildren().addAll(dockTitleBar);
 
     if (viewController != null)
     {
       viewController.setDockTitleBar(dockTitleBar);
     }
 
-    VBox.setVgrow(contents, Priority.ALWAYS);
+    if (contents != null) 
+    {
+      getChildren().addAll(contents);
+      VBox.setVgrow(contents, Priority.ALWAYS);
+    }
 
     this.getStyleClass().add("dock-node");
   }
@@ -725,6 +733,25 @@ public class DockNode extends VBox implements EventHandler<MouseEvent>
   {
     this.graphicProperty.setValue(graphic);
   }
+  
+  private ObjectProperty<DockPos> dockPosProperty = new SimpleObjectProperty<DockPos>() {
+    @Override
+    public String getName() {
+      return "dockPos";
+    }
+  };
+  
+  public final ObjectProperty<DockPos> dockPosProperty() {
+    return dockPosProperty;
+  }
+  
+  public final DockPos getDockPos() {
+    return dockPosProperty.get();
+  }
+  
+  public final void setDockPos(DockPos dockPos) {
+    dockPosProperty.set(dockPos);
+  }
 
   /**
    * Boolean property maintaining bidirectional state of the caption title for
@@ -736,7 +763,7 @@ public class DockNode extends VBox implements EventHandler<MouseEvent>
   {
     return titleProperty;
   }
-
+  
   private StringProperty titleProperty =
                                        new SimpleStringProperty("Dock")
                                        {
