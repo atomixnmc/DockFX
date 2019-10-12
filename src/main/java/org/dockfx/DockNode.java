@@ -41,6 +41,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -1248,7 +1249,8 @@ public class DockNode extends VBox implements EventHandler<MouseEvent>
   /**
    * The last position of the mouse that was within the minimum layout bounds.
    */
-  private Point2D sizeLast;
+  private Point2D origMousePos;
+  private Rectangle origStage = new Rectangle();
   /**
    * Whether we are currently resizing in a given direction.
    */
@@ -1278,7 +1280,11 @@ public class DockNode extends VBox implements EventHandler<MouseEvent>
 
     if (event.getEventType() == MouseEvent.MOUSE_PRESSED)
     {
-      sizeLast = new Point2D(event.getScreenX(), event.getScreenY());
+      origStage.setX(stage.getX());
+      origStage.setY(stage.getY());
+      origStage.setWidth(stage.getWidth());
+      origStage.setHeight(stage.getHeight());
+      origMousePos = new Point2D(event.getScreenX(), event.getScreenY());
     }
     else if (event.getEventType() == MouseEvent.MOUSE_MOVED)
     {
@@ -1333,65 +1339,36 @@ public class DockNode extends VBox implements EventHandler<MouseEvent>
       this.getScene().setCursor(cursor);
     }
     else if (event.getEventType() == MouseEvent.MOUSE_DRAGGED
-             && this.isMouseResizeZone())
-    {
-      Point2D sizeCurrent = new Point2D(event.getScreenX(),
-                                        event.getScreenY());
-      Point2D sizeDelta = sizeCurrent.subtract(sizeLast);
+            && this.isMouseResizeZone())
+   {
+      double newWidth = stage.getWidth();
+      double newHeight = stage.getHeight();
+      double newX = stage.getX();
+      double newY = stage.getY();
 
-      double newX = stage.getX(), newY = stage.getY(),
-          newWidth = stage.getWidth(), newHeight = stage.getHeight();
-
-      if (sizeNorth)
-      {
-        newHeight -= sizeDelta.getY();
-        newY += sizeDelta.getY();
-      }
-      else if (sizeSouth)
-      {
-        newHeight += sizeDelta.getY();
+      if (sizeWest) {
+        newX = event.getScreenX() - (origMousePos.getX() - origStage.getX());
+        newWidth = origStage.getWidth() + origMousePos.getX() - event.getScreenX();
+      } else if (sizeEast) {
+        newWidth = origStage.getWidth() + event.getScreenX() - origMousePos.getX();
       }
 
-      if (sizeWest)
-      {
-        newWidth -= sizeDelta.getX();
-        newX += sizeDelta.getX();
-      }
-      else if (sizeEast)
-      {
-        newWidth += sizeDelta.getX();
+      if (sizeNorth) {
+        newY = event.getScreenY() - (origMousePos.getY() - origStage.getY());
+        newHeight = origStage.getHeight() + origMousePos.getY() - event.getScreenY();
+      } else if (sizeSouth) {
+        newHeight = origStage.getHeight() + event.getScreenY() - origMousePos.getY();
       }
 
-      // TODO: find a way to do this synchronously and eliminate the flickering
-      // of moving the stage
-      // around, also file a bug report for this feature if a work around can
-      // not be found this
-      // primarily occurs when dragging north/west but it also appears in native
-      // windows and Visual
-      // Studio, so not that big of a concern.
-      // Bug report filed:
-      // https://bugs.openjdk.java.net/browse/JDK-8133332
-      double currentX = sizeLast.getX(), currentY = sizeLast.getY();
-      if (newWidth >= stage.getMinWidth())
-      {
+      if (newWidth >= stage.getMinWidth()) {
         stage.setX(newX);
         stage.setWidth(newWidth);
-        currentX = sizeCurrent.getX();
       }
 
-      if (newHeight >= stage.getMinHeight())
-      {
+      if (newHeight >= stage.getMinHeight()) {
         stage.setY(newY);
         stage.setHeight(newHeight);
-        currentY = sizeCurrent.getY();
       }
-      sizeLast = new Point2D(currentX, currentY);
-      // we do not want the title bar getting these events
-      // while we are actively resizing
-      if (sizeNorth || sizeSouth || sizeWest || sizeEast)
-      {
-        event.consume();
-      }
-    }
+   }
   }
 }
