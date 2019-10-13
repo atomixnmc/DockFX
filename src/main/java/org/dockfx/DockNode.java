@@ -1345,14 +1345,14 @@ public class DockNode extends VBox implements EventHandler<MouseEvent>
       double newHeight = stage.getHeight();
       double newX = stage.getX();
       double newY = stage.getY();
-
+      
       if (sizeWest) {
         newX = event.getScreenX() - (origMousePos.getX() - origStage.getX());
         newWidth = origStage.getWidth() + origMousePos.getX() - event.getScreenX();
       } else if (sizeEast) {
         newWidth = origStage.getWidth() + event.getScreenX() - origMousePos.getX();
       }
-
+      
       if (sizeNorth) {
         newY = event.getScreenY() - (origMousePos.getY() - origStage.getY());
         newHeight = origStage.getHeight() + origMousePos.getY() - event.getScreenY();
@@ -1360,12 +1360,14 @@ public class DockNode extends VBox implements EventHandler<MouseEvent>
         newHeight = origStage.getHeight() + event.getScreenY() - origMousePos.getY();
       }
 
-      if (newWidth >= stage.getMinWidth()) {
+      double minScreenX = Screen.getPrimary().getVisualBounds().getMinX();
+      if (newWidth >= stage.getMinWidth() && event.getScreenX() > minScreenX) {
         stage.setX(newX);
         stage.setWidth(newWidth);
       }
 
-      if (newHeight >= stage.getMinHeight()) {
+      double maxScreenY = Screen.getPrimary().getVisualBounds().getMaxY();
+      if (newHeight >= stage.getMinHeight() && event.getScreenY() < maxScreenY) {
         stage.setY(newY);
         stage.setHeight(newHeight);
       }
