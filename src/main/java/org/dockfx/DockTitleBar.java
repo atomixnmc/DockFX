@@ -34,7 +34,10 @@ import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
+import javafx.scene.input.ContextMenuEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
@@ -59,6 +62,8 @@ public class DockTitleBar extends HBox
    * The DockNode this node is a title bar for.
    */
   private final DockNode dockNode;
+  
+  private DockPane dockPane;
   /**
    * The label node used for captioning and the graphic.
    */
@@ -67,6 +72,8 @@ public class DockTitleBar extends HBox
    * State manipulation buttons including close, maximize, detach, and restore.
    */
   private final Button closeButton, stateButton, minimizeButton;
+  
+  private ContextMenu contextMenu;
 
   /**
    * Creates a default DockTitleBar with captions and dragging behavior.
@@ -174,8 +181,42 @@ public class DockTitleBar extends HBox
               }
             });
     getChildren().addAll(label, fillPane, stateButton, closeButton);
+    
+    contextMenu = new ContextMenu();
+    MenuItem menuItem = new MenuItem("Save");
+    menuItem.setOnAction(new EventHandler<ActionEvent>() {
+		@Override
+		public void handle(ActionEvent event) {
+			if (dockPane != null && dockPane.getPreferencesFilePath() != null) {
+				dockPane.storePreference(dockPane.getPreferencesFilePath());
+			}
+		}
+    });
+
+    menuItem = new MenuItem("Load");
+    menuItem.setOnAction(new EventHandler<ActionEvent>() {
+		@Override
+		public void handle(ActionEvent event) {
+			if (dockPane != null && dockPane.getPreferencesFilePath() != null) {
+				dockPane.loadPreference(dockPane.getPreferencesFilePath());
+			}
+		}
+    });
+
+    contextMenu.getItems().add(menuItem);
+    final DockTitleBar finalThis = this;
+    this.setOnContextMenuRequested(new EventHandler<ContextMenuEvent>() {
+        @Override
+        public void handle(ContextMenuEvent event) {
+            contextMenu.show(finalThis, event.getScreenX(), event.getScreenY());
+        }
+    });
   }
 
+  public void setDockPane(DockPane dockPane) {
+	  this.dockPane = dockPane;
+  }
+  
   /**
    * Whether this title bar is currently being dragged.
    *
@@ -323,18 +364,20 @@ public class DockTitleBar extends HBox
     // RFE for public scene graph traversal API filed but closed:
     // https://bugs.openjdk.java.net/browse/JDK-8133331
 
-    ObservableList<Stage> stages =
-                                 FXCollections.unmodifiableObservableList(StageHelper.getStages());
+    ObservableList<Stage> stages = FXCollections.unmodifiableObservableList(StageHelper.getStages());
+//    ObservableList<Window> stages = FXCollections.unmodifiableObservableList(Window.getWindows());
     // fire the dock over event for the active stages
-    for (Stage targetStage : stages)
+   stageLoop:
+    for (Window targetStage : stages)
     {
       // obviously this title bar does not need to receive its own events
       // though users of this library may want to know when their
       // dock node is being dragged by subclassing it or attaching
       // an event listener in which case a new event can be defined or
       // this continue behavior can be removed
-      if (targetStage == this.dockNode.getStage())
-        continue;
+      if (targetStage == this.dockNode.getScene().getWindow()) {
+    	  continue;  
+      }
 
       eventTask.reset();
 
@@ -381,6 +424,7 @@ public class DockTitleBar extends HBox
         if (notFired)
         {
           eventTask.run(parent, dragNode);
+          break stageLoop;
         }
       }
 

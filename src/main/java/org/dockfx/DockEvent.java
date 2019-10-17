@@ -376,12 +376,13 @@ public class DockEvent extends Event
     this.pickResult =
                     pickResult != null ? pickResult
                                        : new PickResult(target, x, y);
-    final Point3D p =
-                    InputEventUtils.recomputeCoordinates(this.pickResult,
-                                                         null);
-    this.x = p.getX();
-    this.y = p.getY();
-    this.z = p.getZ();
+    //This may have been used to handle the unmaximize event so that the docknode goes back to the original position
+//    final Point3D p =
+//                    InputEventUtils.recomputeCoordinates(this.pickResult,
+//                                                         null);
+//    this.x = p.getX();
+//    this.y = p.getY();
+//    this.z = p.getZ();
     this.contents = contents;
   }
 

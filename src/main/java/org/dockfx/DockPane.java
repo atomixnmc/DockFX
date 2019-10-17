@@ -139,6 +139,8 @@ public class DockPane extends StackPane
    * pane.
    */
   private Popup dockIndicatorPopup;
+  
+  private String preferencesFilePath;
 
   /**
    * Base class for a dock indicator button that allows it to be displayed
@@ -215,6 +217,14 @@ public class DockPane extends StackPane
       return dockRoot;
     }
   }
+  
+  public void setPreferencesFilePath(String preferencesFilePath) {
+	  this.preferencesFilePath = preferencesFilePath;
+  }
+  
+  public String getPreferencesFilePath() {
+	  return preferencesFilePath;
+  }
 
   /**
    * A collection used to manage the indicator buttons and automate hit
@@ -251,7 +261,7 @@ public class DockPane extends StackPane
       }
 
     });
-
+    this.getStylesheets().add(getDefaultUserAgentStylesheet());
     dockIndicatorPopup = new Popup();
     dockIndicatorPopup.setAutoFix(false);
 
@@ -261,7 +271,8 @@ public class DockPane extends StackPane
     StackPane dockRootPane = new StackPane();
     dockRootPane.prefWidthProperty().bind(this.widthProperty());
     dockRootPane.prefHeightProperty().bind(this.heightProperty());
-
+    dockRootPane.getStylesheets().add(getDefaultUserAgentStylesheet());
+    
     dockAreaIndicator = new Rectangle();
     dockAreaIndicator.setManaged(false);
     dockAreaIndicator.setMouseTransparent(true);
@@ -329,7 +340,8 @@ public class DockPane extends StackPane
     dockPosIndicator.add(dockBottom, 1, 2);
     dockPosIndicator.add(dockLeft, 0, 1);
     dockPosIndicator.add(dockCenter, 1, 1);
-
+    dockPosIndicator.getStylesheets().add(getDefaultUserAgentStylesheet());
+    
     dockRootPane.getChildren().addAll(dockAreaIndicator,
                                       dockTopRoot,
                                       dockRightRoot,
@@ -412,17 +424,6 @@ public class DockPane extends StackPane
   public final static String getDefaultUserAgentStylesheet()
   {
     return DockPane.class.getResource("default.css").toExternalForm();
-  }
-
-  /**
-   * Helper function to add the default style sheet of DockFX to the user agent
-   * style sheets.
-   */
-  public final static void initializeDefaultUserAgentStylesheet()
-  {
-    StyleManager.getInstance()
-                .addUserAgentStylesheet(DockPane.class.getResource("default.css")
-                                                      .toExternalForm());
   }
 
   /**

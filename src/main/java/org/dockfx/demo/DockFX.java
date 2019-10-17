@@ -158,7 +158,7 @@ public class DockFX extends Application
 
     primaryStage.setScene(new Scene(mainBorderPane, 800, 500));
     primaryStage.sizeToScene();
-
+//    primaryStage.getScene().getStylesheets().add(DockPane.getDefaultUserAgentStylesheet());
     primaryStage.show();
 
     // can be created and docked before or after the scene is created
@@ -188,21 +188,6 @@ public class DockFX extends Application
                   System.out.println("TreeDock(DockPos.RIGHT) is closed.");
               }
             });
-
-    // test the look and feel with both Caspian and Modena
-    Application.setUserAgentStylesheet(Application.STYLESHEET_MODENA);
-    // initialize the default styles for the dock pane and undocked nodes using
-    // the DockFX
-    // library's internal Default.css stylesheet
-    // unlike other custom control libraries this allows the user to override
-    // them globally
-    // using the style manager just as they can with internal JavaFX controls
-    // this must be called after the primary stage is shown
-    // https://bugs.openjdk.java.net/browse/JDK-8132900
-    DockPane.initializeDefaultUserAgentStylesheet();
-
-    // TODO: after this feel free to apply your own global stylesheet using the
-    // StyleManager class
   }
 
   private TreeView<String> generateRandomTree()

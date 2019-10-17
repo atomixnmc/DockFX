@@ -16,16 +16,38 @@
         <netbeans.checkstyle.format>true</netbeans.checkstyle.format>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <fileExtensions>java, properties, xml</fileExtensions>
+        <javafx.version>13</javafx.version>
     </properties>
-
+    
+   <!-- 
+<dependencies>
+  <dependency>
+    <groupId>org.openjfx</groupId>
+    <artifactId>javafx-controls</artifactId>
+    <version>${javafx.version}</version>
+  </dependency>
+  <dependency>
+    <groupId>org.openjfx</groupId>
+    <artifactId>javafx-fxml</artifactId>
+    <version>${javafx.version}</version>
+  </dependency>
+  <dependency>
+    <groupId>org.openjfx</groupId>
+    <artifactId>javafx-web</artifactId>
+    <version>${javafx.version}</version>
+  </dependency>
+</dependencies>
+ -->
+ 
     <build>
+    	<pluginManagement>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <configuration>
                     <archive>
-                        <manifestFile>target/classes/META-INF/MANIFEST.MF</manifestFile>
+                       <!--  <manifestFile>target/classes/META-INF/MANIFEST.MF</manifestFile> -->
                         <manifest>
                             <mainClass>org.dockfx.demo.DockFX</mainClass>
                         </manifest>
@@ -71,6 +93,7 @@
                 </configuration>
             </plugin>
         </plugins>
+        </pluginManagement>
     </build>
 
     <distributionManagement>

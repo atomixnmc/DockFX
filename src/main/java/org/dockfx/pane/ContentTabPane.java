@@ -8,10 +8,11 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Skin;
 import javafx.scene.control.TabPane;
+//import javafx.scene.control.skin.TabPaneSkin;
 
 import org.dockfx.DockNode;
 import org.dockfx.DockPos;
-import org.dockfx.pane.skin.ContentTabPaneSkin;
+//import org.dockfx.pane.skin.ContentTabPaneSkin;
 
 /**
  * ContentTabPane holds multiple tabs
@@ -27,12 +28,12 @@ public class ContentTabPane extends TabPane implements ContentPane
   {
   }
 
-  /** {@inheritDoc} */
-  @Override
-  protected Skin<?> createDefaultSkin()
-  {
-    return new ContentTabPaneSkin(this);
-  }
+//  /** {@inheritDoc} */
+//  @Override
+//  protected Skin<?> createDefaultSkin()
+//  {
+//    return new TabPaneSkin(this);
+//  }
 
   public Type getType()
   {

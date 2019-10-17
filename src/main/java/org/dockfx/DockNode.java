@@ -169,7 +169,7 @@ public class DockNode extends VBox implements EventHandler<MouseEvent>
                                                 // http://bugs.java.com/bugdatabase/view_bug.do?bug_id=4737788
                                                 // Bug report filed:
                                                 // https://bugs.openjdk.java.net/browse/JDK-8133330
-                                                if (this.get())
+                                                if (get())
                                                 {
                                                   Screen screen =
                                                                 Screen.getScreensForRectangle(stage.getX(),
@@ -489,9 +489,8 @@ public class DockNode extends VBox implements EventHandler<MouseEvent>
       if (dockPane != null && dockPane.getScene() != null
           && dockPane.getScene().getWindow() != null)
       {
-        stage.initOwner(dockPane.getScene().getWindow());
+//        stage.initOwner(dockPane.getScene().getWindow());
       }
-
       stage.initStyle(stageStyle);
 
       // offset the new stage to cover exactly the area the dock was local to
@@ -573,7 +572,8 @@ public class DockNode extends VBox implements EventHandler<MouseEvent>
                             + insetsDelta.getBottom();
 
       stage.setScene(scene);
-
+      scene.getStylesheets().addAll(dockPane.getStylesheets());
+      scene.getStylesheets().addAll(dockPane.getScene().getStylesheets());
       stage.setMinWidth(borderPane.minWidth(this.getMinWidth())
                         + insetsWidth);
       stage.setMinHeight(borderPane.minHeight(this.getMinHeight())
@@ -942,7 +942,7 @@ public class DockNode extends VBox implements EventHandler<MouseEvent>
   {
     if (null != stage)
     {
-      stage.setIconified(minimized);
+//      stage.setIconified(minimized);
       this.minimizedProperty.set(minimized);
     }
   }

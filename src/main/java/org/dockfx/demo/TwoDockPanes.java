@@ -78,12 +78,9 @@ public class TwoDockPanes extends Application
     dp1.setExclusive(true);
 
     primaryStage.setScene(new Scene(vbox, 800, 500));
+    primaryStage.getScene().getStylesheets().add(DockPane.getDefaultUserAgentStylesheet());
     primaryStage.sizeToScene();
     primaryStage.show();
-
-    // test the look and feel with both Caspian and Modena
-    Application.setUserAgentStylesheet(Application.STYLESHEET_MODENA);
-    DockPane.initializeDefaultUserAgentStylesheet();
   }
 
   private DockPane makeDockPane(String name)
